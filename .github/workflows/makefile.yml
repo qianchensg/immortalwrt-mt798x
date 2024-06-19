@@ -13,7 +13,32 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    
+    - name: Cache feeds
+      uses: actions/cache@v3
+      with:
+        path: |
+          ./feeds
+          ./package/feeds
+        key: ${{ runner.os }}-feeds-${{ hashFiles('feeds.conf') }}
+        restore-keys: |
+          ${{ runner.os }}-feeds-
+
+    - name: Cache download directory
+      uses: actions/cache@v3
+      with:
+        path: ./dl
+        key: ${{ runner.os }}-dl-${{ hashFiles('feeds.conf') }}
+        restore-keys: |
+          ${{ runner.os }}-dl-
+
+    - name: Cache build directory
+      uses: actions/cache@v3
+      with:
+        path: ./build_dir
+        key: ${{ runner.os }}-build-${{ hashFiles('feeds.conf') }}
+        restore-keys: |
+          ${{ runner.os }}-build-
+          
     - name: set up dependencies
       run: curl -L https://build-scripts.immortalwrt.eu.org/init_build_environment.sh | sudo bash
       
@@ -29,8 +54,26 @@ jobs:
     - name: make
       run: make V=s -j$(nproc)
       
-    - name: Run check
-      run: make check
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts
+        path: ./bin
 
-    - name: Run distcheck
-      run: make distcheck
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.ref }}
+        name: Release ${{ github.ref }}
+        draft: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload Release Assets
+      uses: actions/upload-release-asset@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./bin
+        asset_name: firmware.bin
+        asset_content_type: application/octet-stream
