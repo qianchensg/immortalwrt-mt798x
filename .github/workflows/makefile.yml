@@ -27,8 +27,8 @@ jobs:
       run:  cp -f defconfig/mt7981-ax3000.config .config
 
     - name: make
-      run: make V=s -j$(nproc)
-
+      run: make V=s
+      
     - name: Run check
       run: make check
 
