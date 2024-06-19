@@ -25,9 +25,6 @@ jobs:
 
     - name: copy config file
       run:  cp -f defconfig/mt7981-ax3000.config .config
-      
-    - name: configure
-      run: make menuconfig
 
     - name: make
       run: make V=s -j$(nproc)
