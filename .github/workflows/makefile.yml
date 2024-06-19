@@ -24,10 +24,10 @@ jobs:
       run: ./scripts/feeds install -a
 
     - name: copy config file
-      run:  cp -f defconfig/mt7981-ax3000.config .config
+      run:  cp -f defconfig/mt7981-ax3000.config .config | make defconfig
 
     - name: make
-      run: make V=s
+      run: make V=s -j$(nproc)
       
     - name: Run check
       run: make check
