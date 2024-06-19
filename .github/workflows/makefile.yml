@@ -15,7 +15,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: copy config file
-      run:  -f defconfig/mt7981-ax3000.config .config
+      run:  cp -f defconfig/mt7981-ax3000.config .config
 
     - name: configure
       run: ./configure
