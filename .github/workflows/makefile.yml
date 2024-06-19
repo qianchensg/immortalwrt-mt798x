@@ -13,15 +13,24 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    
+    - name: set up dependencies
+      run: sudo bash -c 'bash <(curl -s https://build-scripts.immortalwrt.eu.org/init_build_environment.sh)'
+
+    - name: update feeds
+      run: ./scripts/feeds update -a
+
+    - name: install feeds
+      run: ./scripts/feeds install -a
 
     - name: copy config file
       run:  cp -f defconfig/mt7981-ax3000.config .config
-
+      
     - name: configure
-      run: ./configure
+      run: make menuconfig
 
-    - name: Install dependencies
-      run: make
+    - name: make
+      run: make V=s -j$(nproc)
 
     - name: Run check
       run: make check
